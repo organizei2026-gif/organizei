@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Organizei 2026 – Assistente Financeiro</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f0f0f;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px;
+    }
+
+    .container {
+      max-width: 600px;
+      width: 100%;
+      background: #1a1a1a;
+      padding: 25px;
+      border-radius: 14px;
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      margin: 0 0 20px;
+      font-size: 30px;
+    }
+
+    .gif-box img {
+      width: 100%;
+      border-radius: 12px;
+    }
+
+    #chatbox {
+      height: 270px;
+      overflow-y: auto;
+      background: #121212;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 20px;
+      border: 1px solid #333;
+    }
+
+    #userInput {
+      width: 100%;
+      padding: 12px;
+      margin-top: 12px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 12px;
+      padding: 14px;
+      background: #00e676;
+      color: black;
+      border: none;
+      font-weight: bold;
+      font-size: 17px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #00c765;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <h1>Organizei 2026 💸🔥</h1>
+
+    <div class="gif-box">
+      <img src="organizei2026.gif" alt="Organizei GIF">
+    </div>
+
+    <div id="chatbox"></div>
+
+    <input id="userInput" type="text" placeholder="Digite algo... (Ex: gastei 20 reais no mercado)" 
+           onkeydown="if(event.key==='Enter') sendMessage()">
+
+    <button onclick="sendMessage()">Enviar</button>
+
+  </div>
+
+  <script>
+    // Memória dos gastos
+    if (!window.financeMemory) window.financeMemory = [];
+
+    function sendMessage() {
+      const box = document.getElementById('chatbox');
+      const input = document.getElementById('userInput');
+      const text = input.value.trim().toLowerCase();
+      if (!text) return;
+
+      box.innerHTML += `<div><strong>Você:</strong> ${text}</div>`;
+      input.value = '';
+
+      let resposta = "";
+
+      // REGISTRAR GASTOS
+      const regex = /(gastei|paguei|comprei|anote)\s*(\d+[.,]?\d*)\s*(reais)?\s*(em|com)?\s*(.*)/i;
+      const match = text.match(regex);
+
+      if (match) {
+        const valor = parseFloat(match[2].replace(',', '.'));
+        const categoria = match[5] || "Não informado";
+
+        window.financeMemory.push({ valor, categoria });
+        resposta = `Anotado! R$ ${valor.toFixed(2)} em "${categoria}".`;
+      }
+
+      // RESUMO
+      else if (text.includes("resumo") || text.includes("total") || text.includes("gastos")) {
+        if (window.financeMemory.length === 0) {
+          resposta = "Nenhum gasto registrado ainda.";
+        } else {
+          let total = 0;
+          window.financeMemory.forEach(item => total += item.valor);
+          resposta = `Você tem ${window.financeMemory.length} registros, totalizando **R$ ${total.toFixed(2)}**.`;
+        }
+      }
+
+      // LIMPAR
+      else if (text.includes("limpar") || text.includes("apagar tudo")) {
+        window.financeMemory = [];
+        resposta = "Todos os registros foram apagados.";
+      }
+
+      // AJUDA
+      else if (text.includes("ajuda") || text.includes("como usar")) {
+        resposta =
+          "Você pode dizer:\n" +
+          "• Gastei 50 no mercado\n" +
+          "• Comprei 20 reais em roupas\n" +
+          "• Resumo dos gastos\n" +
+          "• Limpar tudo";
+      }
+
+      // PADRÃO
+      else {
+        resposta =
+          'Não entendi, mas você pode registrar gastos assim: "Gastei 30 reais com comida".';
+      }
+
+      box.innerHTML += `<div><strong>Organizei:</strong> ${resposta}</div>`;
+      box.scrollTop = box.scrollHeight;
+    }
+  </script>
+
+</body>
+</html>
